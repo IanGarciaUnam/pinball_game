@@ -1,0 +1,233 @@
+<html>
+<BODY BGCOLOR=#1C1C1C>
+<meta charset="UTF-8">
+<title>PLAY PINBALL!!</title>
+<td align=center>
+
+</audio>
+
+
+<canvas id="gameCanvas" width= 1600 height= 800></canvas>
+
+<script>
+var canvas;
+var canvasContext;
+var ballX=getRandomArbitrary(350,355)
+var speedBallX=5;
+var ballY=getRandomArbitrary(290,300);
+var speedBallY=5;
+var es=35;
+var es2=1;
+
+
+var player1Score=0;
+var jugador2=0;
+const JUGADOR_GANA=10;
+var jugadorGanaPantalla=false;
+var paddle1Y=250;
+const PADDLE_HEIGHT=100;
+const PADDLE_THICKNESS=20;
+var paddle2Y=250;
+
+function getRandomArbitrary(min, max) {
+  return Math.random() * (max - min) + min;
+}
+
+function calculateMouse(evt){
+var rect = canvas.getBoundingClientRect();
+var root = document.documentElement;
+var mouseX= evt.clientX - rect.left-root.scroollLeft;
+var mouseY= evt.clientY - rect.top -root.scrollTop;
+return{
+x:mouseX,
+y:mouseY
+   };
+}
+
+function handleMouseClick(evt){
+
+if(jugadorGanaPantalla){
+player1Score=0;
+jugador2=0;
+jugadorGanaPantalla=false;}
+}
+window.onload=function(){
+console.log("ValkirIA");
+canvas=document.getElementById('gameCanvas');
+canvasContext=canvas.getContext('2d');
+
+var framesPerSecond=30;
+setInterval( function(){
+moveEverything();
+
+
+drawEverything();
+},1000/framesPerSecond);
+
+canvas.addEventListener('mousedown',handleMouseClick);
+
+canvas.addEventListener('mousemove',
+function(evt){
+var mousePos =calculateMouse(evt);
+  paddle1Y=mousePos.y-(PADDLE_HEIGHT/2);
+});
+}
+
+function ballReset(){
+
+if(jugador2==JUGADOR_GANA || player1Score==JUGADOR_GANA){
+jugadorGanaPantalla=true;
+}else{
+ballX=getRandomArbitrary((canvas.width/2)-2,canvas.width +2)//50.1;
+ballY=400//getRandomArbitrary(canvas.height/2,(canvas.height/2)+5)//50.12;
+speedBallX=-speedBallX;
+speedBallY=-speedBallY;
+
+}
+
+
+}
+function computerMovement(){
+var paddle2YCenter = paddle2Y +(PADDLE_HEIGHT/2);
+
+if (paddle2YCenter < ballY-24){
+paddle2Y += 10;
+}else if(paddle2YCenter > ballY+23){
+paddle2Y -= 10;
+}else if(paddle2YCenter>screen.width-20){
+paddle2Y-=10;
+}
+
+}
+
+
+function moveEverything(){
+if(jugadorGanaPantalla){
+return;
+}
+computerMovement();
+
+ballX += speedBallX; 
+ballY += speedBallY;
+
+if(ballX <0){
+if(ballY > paddle1Y && ballY < paddle1Y+PADDLE_HEIGHT){
+ speedBallX=-(speedBallX+ getRandomArbitrary(0,5));
+var deltaY =ballY-(paddle1Y+PADDLE_HEIGHT/2)*2.717273818283;
+ballSpeedY =-deltaY*(1/5) - getRandomArbitrary(1,10) ;
+
+ }else{
+ jugador2++; /*PAUSA PARA EL GANADOR*/
+ballReset();
+ 
+ }
+}
+if(ballX>canvas.width){/***manejo rebote pelota***/
+if(ballY > paddle2Y && ballY < paddle2Y+PADDLE_HEIGHT ){
+ballSpeedY = -deltaY*(2/3)- getRandomArbitrary(1, 10);
+speedBallX=-speedBallX - getRandomArbitrary(1, 5);
+
+
+}else{
+ player1Score++; /*PAUSA  PARA GANADOR*/
+ ballReset();
+
+   }
+}
+
+if(ballY<=0){
+speedBallY-=speedBallY-getRandomArbitrary(1,10);
+
+}
+if(ballY>canvas.height){
+speedBallY=-(speedBallY +getRandomArbitrary(1,6));
+ballY=ballY-20;
+}
+
+
+}
+function drawNet(){
+for(var i=0;i<canvas.height;i+=40){
+colorRect(canvas.width/2-1,i,2,20,'orange');
+}
+}
+function drawEverything(){
+
+
+console.log("called drawEverything");
+console.log(ballX);
+console.log(screen.width);
+console.log(screen.height);
+
+ 
+//display
+colorRect(0,0,canvas.width,canvas.height,'black');
+
+
+//plica maquina
+drawNet();
+colorRect(canvas.width-PADDLE_THICKNESS,paddle2Y,PADDLE_THICKNESS,PADDLE_HEIGHT,'white');
+
+canvasContext.fillText("El score máquina es:  "+jugador2,canvas.width-200,100);
+
+//plica
+colorRect(0,paddle1Y,PADDLE_THICKNESS,PADDLE_HEIGHT,'purple');
+canvasContext.fillText("Tu score es:  "+player1Score,100,100);
+//pelota
+colorCircle(ballX++,ballY++,10,'white');
+
+gameOver();
+
+ }
+//parametros de objetos en drawEverything
+function colorRect(leftX,topY,width,height,drawColor){
+canvasContext.fillStyle=drawColor;
+canvasContext.fillRect(leftX,topY,width,height);
+}
+//parametros circulo
+function colorCircle(centerX,centerY,radius,drawColor){
+canvasContext.fillStyle =drawColor;
+canvasContext.beginPath();
+canvasContext.arc(centerX,centerY,radius,0,Math.PI*1/6,true);
+canvasContext.fill();
+}
+function gameOver(){
+	if(jugadorGanaPantalla==true){
+ 
+
+ if( player1Score>=10){
+
+canvasContext.fillStyle='orange';
+canvasContext.font='Arial 31px ';
+
+canvasContext.fillText("GANASTE",i,canvas.height/2);
+
+	}
+}else if (jugador2>=10){
+canvasContext.fillStyle='orange';
+canvasContext.font='Arial 31px ';
+canvasContext.fillText("Ganá Máquina",speedBallX,canvas.height/2);
+
+ballReset()
+
+canvasContext.font="Verdana 9px ";
+
+canvasContext.fillText("[Click para reiniciar]",speedBallX,canvas.height/2);
+speedBallX=0
+speedBallY=0
+
+
+
+return;
+
+}
+
+}
+
+</script>
+</td>
+<script>
+</script>
+</script>
+
+</html>
