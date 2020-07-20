@@ -1,0 +1,280 @@
+<html>
+<BODY BGCOLOR=#1C1C1C>
+<meta charset="UTF-8">
+<title>¡¡FELIZ DÍA DE MUERTOS!!</title>
+<td align=center>
+<audio src="MusicN/Pis1.mp3" controls autoplay loop>
+<p>Tu navegador no implementa el elemento audio</p>
+</audio>
+
+
+<canvas id="gameCanvas" width=1575 height=820></canvas>
+
+<script>
+var canvas;
+var canvasContext;
+var ballX=35;
+var speedBallX=10;
+var ballY=50;
+var speedBallY=10;
+var es=35;
+var es2=1;
+
+
+var player1Score=0;
+var jugador2=0;
+const JUGADOR_GANA=3;
+var jugadorGanaPantalla=false;
+var paddle1Y=250;
+const PADDLE_HEIGHT=100;
+const PADDLE_THICKNESS=10;
+var paddle2Y=250;
+
+
+
+function calculateMouse(evt){
+var rect = canvas.getBoundingClientRect();
+var root = document.documentElement;
+var mouseX= evt.clientX - rect.left-root.scroollLeft;
+var mouseY= evt.clientY - rect.top -root.scrollTop;
+return{
+x:mouseX,
+y:mouseY
+   };
+}
+
+function handleMouseClick(evt){
+
+if(jugadorGanaPantalla){
+player1Score=0;
+jugador2=0;
+jugadorGanaPantalla=false;}
+}
+window.onload=function(){
+console.log("ValkirIA");
+canvas=document.getElementById('gameCanvas');
+canvasContext=canvas.getContext('2d');
+
+var framesPerSecond=30;
+setInterval( function(){
+moveEverything();
+
+
+drawEverything();
+},1000/framesPerSecond);
+
+canvas.addEventListener('mousedown',handleMouseClick);
+
+canvas.addEventListener('mousemove',
+function(evt){
+var mousePos =calculateMouse(evt);
+  paddle1Y=mousePos.y-(PADDLE_HEIGHT/2);
+});
+}
+
+function ballReset(){
+
+if(jugador2==JUGADOR_GANA || player1Score==JUGADOR_GANA){
+jugadorGanaPantalla=true;
+}else{
+ballX=50.1;
+ballY=50.12;
+speedBallX=-speedBallX;
+speedBallY=-speedBallY;
+ballX = canvas.width/4*1.816878384;
+ballY =canvas.height/4*2.81828346795*1.81828389468;
+}
+
+
+}
+function computerMovement(){
+var paddle2YCenter = paddle2Y +(PADDLE_HEIGHT/2);
+
+if (paddle2YCenter < ballY-24){
+paddle2Y += 10;
+}else if(paddle2YCenter > ballY+23){
+paddle2Y -= 10;
+}else if(paddle2YCenter>screen.width-20){
+paddle2Y-=10;
+}
+
+}
+
+
+function moveEverything(){
+if(jugadorGanaPantalla){
+return;
+}
+computerMovement();
+
+ballX += speedBallX; 
+ballY += speedBallY;
+
+if(ballX <0){
+if(ballY > paddle1Y && ballY < paddle1Y+PADDLE_HEIGHT){
+ speedBallX=-speedBallX;
+var deltaY =ballY-(paddle1Y+PADDLE_HEIGHT/2)*2.717273818283;
+ballSpeedY =deltaY*0.4/17+15;
+
+ }else{
+ jugador2++; /*PAUSA PARA EL GANADOR*/
+ballReset();
+ 
+ }
+}
+if(ballX>1575){/***manejo rebote pelota***/
+if(ballY > paddle2Y && ballY < paddle2Y+PADDLE_HEIGHT ){
+ballSpeedY = deltaY*2/3+15;
+speedBallX=-speedBallX-3.1592;
+
+
+}else{
+ player1Score++; /*PAUSA  PARA GANADOR*/
+ ballReset();
+
+   }
+}
+
+if(ballY<=0){
+speedBallY-=speedBallY-7;
+
+}
+if(ballY>canvas.height){
+speedBallY=-speedBallY;
+ballY=ballY-20;
+}
+
+
+}
+function drawNet(){
+for(var i=0;i<canvas.height;i+=40){
+colorRect(canvas.width/2-1,i,2,20,'orange');
+}
+}
+function drawEverything(){
+
+
+console.log("called drawEverything");
+console.log(ballX);
+console.log(screen.width);
+console.log(screen.height);
+
+ 
+//display
+colorRect(0,0,canvas.width,canvas.height,'black');
+
+
+//plica maquina
+drawNet();
+colorRect(canvas.width-PADDLE_THICKNESS,paddle2Y,PADDLE_THICKNESS,PADDLE_HEIGHT,'red');
+canvasContext.fillText(jugador2,canvas.width-100,100);
+
+//plica
+colorRect(0,paddle1Y,PADDLE_THICKNESS,PADDLE_HEIGHT,'green');
+canvasContext.fillText(player1Score,100,100);
+//pelota
+colorCircle(ballX++,ballY++,10,'white');
+
+canvasContext.fillStyle='green';
+canvasContext.fillStyle='white';
+canvasContext.font="40px ARIAL black";
+canvasContext.fillText('UNAM',canvas.width/2-75,400);
+canvasContext.fillText('¡CONMEMORACIÓN DE LOS 150 AÑOS DE LA ENP!',canvas.width/2-550,450);
+canvasContext.font="30px Verdana";
+canvasContext.fillText('Por mi raza hablará mi espíritu',canvas.width/2-245,500);
+canvasContext.font="20px Verdana";
+canvasContext.fillText('Programada y escrita por:Chinaski',canvas.width/2-750,600);
+gameOver();
+
+ }
+//parametros de objetos en drawEverything
+function colorRect(leftX,topY,width,height,drawColor){
+canvasContext.fillStyle=drawColor;
+canvasContext.fillRect(leftX,topY,width,height);
+}
+//parametros circulo
+function colorCircle(centerX,centerY,radius,drawColor){
+canvasContext.fillStyle =drawColor;
+canvasContext.beginPath();
+canvasContext.arc(centerX,centerY,radius,0,Math.PI*1/6,true);
+canvasContext.fill();
+}
+function gameOver(){
+
+if(jugadorGanaPantalla==true){
+
+colorRect(0,0,canvas.width/3,canvas.height,"GREEN");
+colorRect(1536/3,0,canvas.width/3,canvas.height,"WHITE");
+colorCircle(1575/2,canvas.height/2,120,"BROWN");//Escudo
+colorRect(1821/2,canvas.height/2,175,"BLUE");
+colorRect(1536/3+520,0,canvas.width/3,canvas.height,"RED");
+
+
+
+
+
+
+if( player1Score>=3){
+canvasContext.fillStyle='BLACK';
+canvasContext.font='Arial 31px ';
+canvasContext.fillText("CELEBRANDO LAS TRADICIONES MEXICANAS",canvas.width/2-es2-250,es+100);
+canvasContext.fillText("SIEMPRE ESTARÁN EN NUESTROS CORAZONES",canvas.width/2-es2-270,es+40);
+canvasContext.fillText("CELEBRANDO A NUESTROS MUERTOS",canvas.width/2-430,es+620);
+canvasContext.fillText("GANASTE",canvas.width/2,es+666);
+}else if (jugador2>=3){
+canvasContext.fillStyle='BLACK';
+canvasContext.font='Arial 31px ';
+canvasContext.fillText("CELEBRANDO LAS TRADICIONES MEXICANAS",canvas.width/2-es2-250,es+100);
+canvasContext.fillText("SIEMPRE ESTARÁN EN NUESTROS CORAZONES",canvas.width/2-es2-255,es+40);
+canvasContext.fillText("CELEBRANDO A NUESTROS MUERTOS",canvas.width/2-200,es+620);
+
+canvasContext.fillText("GANO LA HUESUDA",canvas.width/2-100,es+675);
+
+
+
+}
+canvasContext.font="Verdana 9px ";
+
+canvasContext.fillText("[Click para reiniciar]",canvas.width/2-100,es+750);
+return;
+}
+}
+</script>
+</td>
+<script>
+</script>
+</script>
+<DIV ALIGN=CENTER>
+
+  <font face="Verdana" color="White" align="center" size=12>
+  
+  <br>
+  <br>
+ 
+  Mataba el tiempo Vasconcelos en las tumbas<p>
+  Viendo a quienes pasaban y las  llenaban <p><b>
+ Ciento Cincuenta años de la fundación y los siguen enterrando<p> <b>
+  Es la preparatoria quien sigue mejorando.<p>  <b><p>
+  <br>
+  Tortas y tamales, crepas y papas<p>
+  Son los amigos de quienes aquí se la pasan<p>
+  Honestidad, virtud y paz han transitado <b><p>
+  Junto a la solidaridad por los que se han llevado.<p> 
+  <br>
+  <p>Noviembre no olvidamos, ni nuestros heroes dejamos<p>
+  Gabino se ríe y la calaca sonríe<p>
+  Sierra le dice-¿A dónde vamos?-<p>
+  -Tu sigue sin que tu mirada se desvíe.<p>
+  <br>
+  Todo va bien y los nuestros ahí siguen<P>
+  Orden y Progreso para quienes los viven<P>
+  Vamos reviren dice la calaca <P>
+  Que el dos se acaba y nos vamos en vaca.<P>
+  <br>
+
+  </font>
+   
+  </div>
+
+</BODY>
+</html>
